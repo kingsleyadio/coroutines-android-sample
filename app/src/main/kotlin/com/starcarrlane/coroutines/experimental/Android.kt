@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.starcarrlane.coroutines.com.starcarrlane.experimental
+package com.starcarrlane.coroutines.experimental
 
 import android.os.Handler
 import android.os.Looper

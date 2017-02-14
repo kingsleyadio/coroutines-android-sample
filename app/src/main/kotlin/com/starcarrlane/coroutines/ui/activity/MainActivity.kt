@@ -18,7 +18,7 @@ package com.starcarrlane.coroutines.ui.activity
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import com.starcarrlane.coroutines.com.starcarrlane.experimental.Android
+import com.starcarrlane.coroutines.experimental.Android
 import com.starcarrlane.coroutines.network.SampleClient
 import coroutines.R
 import kotlinx.coroutines.experimental.*
