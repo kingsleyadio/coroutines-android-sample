@@ -40,6 +40,8 @@ class MainActivity : AppCompatActivity(), PostClickListener {
     private lateinit var postsAdapter: PostsAdapter
     private lateinit var postsLayoutManager: RecyclerView.LayoutManager
 
+    private val job = Job()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -53,25 +55,28 @@ class MainActivity : AppCompatActivity(), PostClickListener {
             layoutManager = postsLayoutManager
             adapter = postsAdapter
         }
+
+        launch(Android + job) {
+            try {
+                val result = SampleClient.fetchPosts()
+
+                postsAdapter.setElements(result.await()) // will suspend until the call is finished
+                postsAdapter.notifyDataSetChanged()
+                android.util.Log.i("API", "Result loaded successfully")
+            } catch (exception: IOException){
+                android.util.Log.e("API", "an exception occurred", exception)
+                Toast.makeText(this@MainActivity, "Phone not connected or service down", Toast.LENGTH_SHORT).show()
+            }
+
+        }
     }
 
     override fun onPostClicked(post: Post) {
         Toast.makeText(this, "Clicked ${post.id}", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        launch(Android) {
-            try {
-                val result = SampleClient.fetchPosts()
-
-                postsAdapter.setElements(result.await()) // will suspend until the call is finished
-                postsAdapter.notifyDataSetChanged()
-            } catch (exception: IOException){
-                Toast.makeText(this@MainActivity, "Phone not connected or service down", Toast.LENGTH_SHORT).show()
-            }
-
-        }
+    override fun onDestroy() {
+        android.util.Log.i("Job", "Job is canceled: ${job.cancel()}")
+        super.onDestroy()
     }
 }
