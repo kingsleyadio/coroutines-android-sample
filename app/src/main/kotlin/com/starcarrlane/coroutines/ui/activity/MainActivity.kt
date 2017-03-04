@@ -58,16 +58,18 @@ class MainActivity : AppCompatActivity(), PostClickListener {
 
         launch(Android + job) {
             try {
-                val result = SampleClient.fetchPosts()
+                val result = SampleClient.fetchPosts(job)
 
                 postsAdapter.setElements(result.await()) // will suspend until the call is finished
                 postsAdapter.notifyDataSetChanged()
                 android.util.Log.i("API", "Result loaded successfully")
-            } catch (exception: IOException){
-                android.util.Log.e("API", "an exception occurred", exception)
+            } catch (exception: IOException) {
+                android.util.Log.e("API", "IO exception occurred", exception)
                 Toast.makeText(this@MainActivity, "Phone not connected or service down", Toast.LENGTH_SHORT).show()
+            } catch (exception: Exception) {
+                android.util.Log.e("API", "other exception occurred", exception)
+                Toast.makeText(this@MainActivity, "Some other error: $exception", Toast.LENGTH_SHORT).show()
             }
-
         }
     }
 

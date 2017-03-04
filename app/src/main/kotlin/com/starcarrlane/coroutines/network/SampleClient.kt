@@ -33,8 +33,8 @@ import kotlin.coroutines.experimental.CoroutineContext
 object SampleClient {
     val client = OkHttpClient()
 
-    fun fetchPosts() : Deferred<List<Post>> {
-        return async(CommonPool) {
+    fun fetchPosts(cancellationContext: CoroutineContext) : Deferred<List<Post>> {
+        return async(CommonPool + cancellationContext) {
             delay(500)
             val request = Request.Builder().url("https://jsonplaceholder.typicode.com/posts").build()
             val response =  client.newCall(request).await()
