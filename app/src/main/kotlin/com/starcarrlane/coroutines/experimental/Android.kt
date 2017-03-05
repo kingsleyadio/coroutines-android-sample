@@ -17,30 +17,27 @@ package com.starcarrlane.coroutines.experimental
 
 import android.os.Handler
 import android.os.Looper
-import kotlin.coroutines.experimental.AbstractCoroutineContextElement
-import kotlin.coroutines.experimental.Continuation
-import kotlin.coroutines.experimental.ContinuationInterceptor
+import kotlinx.coroutines.experimental.CoroutineDispatcher
+import kotlin.coroutines.experimental.CoroutineContext
 
 /**
- * Android Continuation, guarantees that, when resumed, is on the UI Thread
- * Created by macastiblancot on 2/13/17.
+ * Android Dispatcher. Guarantees that resumption happens on the specified handler thread.
  */
-private class AndroidContinuation<T>(val cont: Continuation<T>) : Continuation<T> by cont {
-    override fun resume(value: T) {
-        if (Looper.myLooper() == Looper.getMainLooper()) cont.resume(value)
-        else Handler(Looper.getMainLooper()).post { cont.resume(value) }
+class AndroidDispatcher(val handler: Handler) : CoroutineDispatcher() {
+
+    override fun isDispatchNeeded(context: CoroutineContext): Boolean {
+        return Looper.myLooper() != handler.looper
     }
 
-    override fun resumeWithException(exception: Throwable) {
-        if (Looper.myLooper() == Looper.getMainLooper()) cont.resumeWithException(exception)
-        else Handler(Looper.getMainLooper()).post { cont.resumeWithException(exception) }
+    override fun dispatch(context: CoroutineContext, block: Runnable) {
+        handler.post(block)
     }
-}
 
-/**
- * Android context, provides an AndroidContinuation, executes everything on the UI Thread
- */
-object Android : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor {
-    override fun <T> interceptContinuation(continuation: Continuation<T>): Continuation<T> =
-            AndroidContinuation(continuation)
+    companion object {
+
+        /**
+         * Singleton AndroidDispatcher instance that executes on the UI thread
+         */
+        val Main = AndroidDispatcher(Handler(Looper.getMainLooper()))
+    }
 }

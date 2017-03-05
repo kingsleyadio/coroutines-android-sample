@@ -18,13 +18,13 @@ package com.starcarrlane.coroutines.ui.activity
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import com.starcarrlane.coroutines.experimental.Android
-import com.starcarrlane.coroutines.network.SampleClient
 import coroutines.R
 import kotlinx.coroutines.experimental.*
 import android.support.v7.widget.RecyclerView
 import android.widget.Toast
+import com.starcarrlane.coroutines.experimental.AndroidDispatcher
 import com.starcarrlane.coroutines.network.Post
+import com.starcarrlane.coroutines.network.SampleClient
 import com.starcarrlane.coroutines.ui.adapter.PostClickListener
 import com.starcarrlane.coroutines.ui.adapter.PostsAdapter
 import java.io.IOException
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity(), PostClickListener {
             adapter = postsAdapter
         }
 
-        launch(Android + job) {
+        launch(AndroidDispatcher.Main + job) {
             try {
                 val result = SampleClient.fetchPosts(job)
 
@@ -66,9 +66,6 @@ class MainActivity : AppCompatActivity(), PostClickListener {
             } catch (exception: IOException) {
                 android.util.Log.e("API", "IO exception occurred", exception)
                 Toast.makeText(this@MainActivity, "Phone not connected or service down", Toast.LENGTH_SHORT).show()
-            } catch (exception: Exception) {
-                android.util.Log.e("API", "other exception occurred", exception)
-                Toast.makeText(this@MainActivity, "Some other error: $exception", Toast.LENGTH_SHORT).show()
             }
         }
     }
