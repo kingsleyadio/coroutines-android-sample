@@ -16,15 +16,7 @@ suspend fun Call.await(): Response {
     return suspendCancellableCoroutine { cont: CancellableContinuation<Response> ->
         enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                /**
-                 * CALL CANCELED:
-                 *  - Coroutine already canceled: Do nothing
-                 *  - Otherwise: Cancel coroutine to avoid indefinite suspension
-                 *
-                 *  LEGIT FAILURE: resume coroutine with exception
-                 */
-                if (!call.isCanceled) cont.resumeWithException(e)
-                else if (!cont.isCancelled) cont.cancel(e)
+                if (!cont.isCancelled) cont.resumeWithException(e)
             }
 
             override fun onResponse(call: Call, response: Response) {
